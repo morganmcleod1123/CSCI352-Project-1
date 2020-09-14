@@ -40,16 +40,12 @@ class _MyHomePageState extends State<MyHomePage> {
     _ts = Theme.of(context).textTheme.headline4;
     return Scaffold(
       appBar: AppBar(
-        title: !isSearching ? Text(widget.title): TextField(decoration: InputDecoration(hintText: "Search for Recycling Plants"),),
+        title: Text("Recycling Plant Locator"),
         actions: <Widget>[
           IconButton(
-              icon: Icon(Icons.search),
-            onPressed: (){
-                setState(() {
-                  this.isSearching = !this.isSearching;
-                });
-            },
-          ),
+              icon: Icon(Icons.search), onPressed: () {
+           showSearch(context: context, delegate: DataSearch());
+          }),
         ],
       ),
       body: Center(
@@ -77,4 +73,82 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+}
+
+class DataSearch extends SearchDelegate<String>{
+  final testing = [
+    "City of Conway Recycling Center",
+    "JSI Metal Recycling",
+    "ecoATM"
+  ];
+
+  final recentSearches = [
+    "City of Conway Recycling Center",
+    "JSI Metal Recycling",
+    "ecoATM"];
+
+  @override
+  List<Widget> buildActions(BuildContext context) {
+    // actions for app bar
+    return[
+      IconButton(icon:Icon(Icons.clear), onPressed: (){
+        query = "";
+      })
+    ];
+    throw UnimplementedError();
+  }
+
+  @override
+  Widget buildLeading(BuildContext context) {
+    // leading icon on the left of the app bar
+    return IconButton(
+      icon: AnimatedIcon(
+        icon:AnimatedIcons.menu_arrow,
+        progress: transitionAnimation,
+      ),
+    onPressed: (){
+        close(context, null);
+    }
+    );
+    throw UnimplementedError();
+  }
+
+  @override
+  Widget buildResults(BuildContext context) {
+    // show some sort of result based on the actions
+    return Container(
+      height: 100.0,
+      width: 100.0,
+      child: Card(
+        color: Colors.green,
+        child: Center(
+          child: Text(query),
+        ),
+      ),
+    );
+    throw UnimplementedError();
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    final suggestionList = query.isEmpty?recentSearches:testing.where((p) => p.startsWith(query)).toList();
+    return ListView.builder(itemBuilder: (context, index) => ListTile(
+      onTap: (){
+        showResults(context);
+      },
+      leading: Icon(Icons.location_city),
+      title: RichText(text: TextSpan(
+        text: suggestionList[index].substring(0,query.length),
+        style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+        children: [TextSpan(
+          text: suggestionList[index].substring(query.length),
+          style: TextStyle(color: Colors.grey)
+        )]
+      )),
+    ),
+      itemCount: suggestionList.length
+    );
+    throw UnimplementedError();
+  }
+
 }
